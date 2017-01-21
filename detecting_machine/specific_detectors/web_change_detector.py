@@ -20,7 +20,7 @@ class WebChangeDetector(IDetector): # KOMPONENT KOMPOZYTU
         self.change_ratio = kwargs.get("ratio", 0.8)
 
     def detect(self):
-        l.info_message("Looking for changes to site {}".format(self.target))
+        l.info_message("Looking for changes on site {}".format(self.target))
         old = ""
 
         while True:
@@ -30,21 +30,14 @@ class WebChangeDetector(IDetector): # KOMPONENT KOMPOZYTU
                 old = current
             else:
                 if self._is_new_content_different(old, current, self.change_ratio):
-                    l.update_message("Site {} has changed!".format(self.target))
+                    l.update_message("Site has changed! - {}".format(self.target))
                     old = current
                 else:
-                    l.info_message("Site {} hasn't changed. Waiting for {} seconds.".format(self.target, self.interval))
+                    l.info_message("Site hasn't changed. Waiting for {} seconds. - {}".format(self.interval, self.target))
 
             time.sleep(self.interval)
 
     def _get_current_page_contents(self):
-        def visible(element):
-            if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
-                return False
-            elif re.match('<!--.*-->', str(element)):
-                return False
-            return True
-
         with urllib.request.urlopen(self.target) as page:
             source = page.read()
             soup = BeautifulSoup(source, "html.parser")
